@@ -50,9 +50,9 @@ The provided starter files include:
    cd bankist-website
    ```
 
-   Open the project in your editor (e.g., VS Code).
+2. Open the project in your editor (e.g., VS Code).
 
-2. Run with Live Server (or similar tool) to see the website in action.
+3. Run with Live Server (or similar tool) to see the website in action.
 
 
 ## 📝 Learning Outcomes
