@@ -22,7 +22,7 @@ The project builds upon the previously developed **Bankist application** by addi
 - **Slider component** – navigation arrows and dots allow cycling through slides.  
 
 
-## ⭐️ Purpose and Benefits  
+## ⭐️ Purpose & Benefits  
 
 By completing this project, I strengthened my skills in:  
 - Writing **clean, modern JavaScript** using best practices.  
