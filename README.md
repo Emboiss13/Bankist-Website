@@ -66,4 +66,3 @@ The provided starter files include:
 This project is part of the course taught by Jonas Schmedtmann on [Udemy](udemy.com/course/the-complete-javascript-course/learn/).
 
 #### 
-####
