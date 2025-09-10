@@ -34,12 +34,13 @@ document.addEventListener('keydown', function (e) {
 
 
 //-------------------------------------------------
-// BUTTON SCROLLING
+// SCROLLING
 //-------------------------------------------------
 
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
 
+// Smooth scrolling
 btnScrollTo.addEventListener('click', function () {
   section1.scrollIntoView({ behavior: 'smooth' });
 });
