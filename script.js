@@ -1,6 +1,6 @@
 'use strict';
 //-------------------------------------------------
-// DOM SELECTION
+// DOM SELECTIONS
 //-------------------------------------------------
 const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
@@ -92,4 +92,35 @@ tabsContainer.addEventListener('click', function (e) {
   document
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
+});
+
+//-------------------------------------------------
+// MENU FADE ANIMATION
+//-------------------------------------------------
+
+//We will use the nav class because we not only want to include the menu, but also the logo
+//Why not mouseEnter? Because mouseEnter doesn't bubble up
+//We need the event bubble so that it can reach the nav element
+
+const handleHover = function(event, opacity){
+ if(event.target.classList.contains('nav__link')){
+    //We need to select the siblings (all the other links) & the logo
+    const link = event.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('.nav__logo');
+
+    //We now trigger our functionality based on the link and its siblings
+    siblings.forEach(element => {
+      if(element !== link) element.style.opacity = opacity;
+    });
+    logo.style.opacity = opacity;
+  }
+};
+
+nav.addEventListener('mouseover', function(event){
+  handleHover(event, 0.5);
+});
+
+nav.addEventListener('mouseout', function(event){
+  handleHover(event, 1);
 });
