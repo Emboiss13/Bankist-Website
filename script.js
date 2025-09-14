@@ -8,10 +8,14 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const allSections = document.querySelectorAll('.section');
 const nav = document.querySelector('.nav');
+const header = document.querySelector('.header');
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
+const imgTargets = document.querySelectorAll('img[data-src]');
+const slides = document.querySelectorAll('.slide');
 
 //-------------------------------------------------
 // MODAL WINDOW
@@ -123,4 +127,149 @@ nav.addEventListener('mouseover', function(event){
 
 nav.addEventListener('mouseout', function(event){
   handleHover(event, 1);
+});
+
+//-------------------------------------------------
+// STICKY NAVIGATION BAR
+//-------------------------------------------------
+
+const initialCoordinates = section1.getBoundingClientRect();
+
+//WE SHOULD AVOID THE SCROLL EVENT SINCE IT TRIGGERS MULTIPLE TIMES
+//This is very bad for performance, specially on mobile devices
+
+// //We make it "sticky" by adding the "nav sticky" CSS class
+// window.addEventListener('scroll', function(){
+//   if(window.scrollY > initialCoordinates.top) nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// });
+
+//We will now do this using the intersection observer API
+//Why? Because it is more efficient.
+//It allows us to observe changes in the intersection of a target element with an ancestor element or with a top-level document's viewport.
+
+/*This funtion will be called each time:
+                 observer element -> intersects:
+                                       -> root element at defined threshold
+*/
+
+const stickyNav = function(entries){
+  const [entry] = entries;
+  if(!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+};
+
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  threshold: [0, 0.2],
+  rootMargin: '-90px',
+});
+
+headerObserver.observe(header);
+
+//-------------------------------------------------
+// REVEAL ELEMENTS AS WE SCROLL CLOSE TO THEM
+//-------------------------------------------------
+
+//We will achieve this by removing the section--hidden class
+const revealSection = function(entries, observer){
+
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    entry.target.classList.remove('section--hidden');
+
+      //Stop observing the element
+    //This will improve performance
+    observer.unobserve(entry.target);
+  });
+};
+
+//We don't want to reveal the section straight away
+//Otherwise the effect is not visible
+//By having a 0.15 threshold, we can control when the section is revealed
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+allSections.forEach(section => {
+  section.classList.add('section--hidden');
+  sectionObserver.observe(section);
+});
+
+//-------------------------------------------------
+// LAZY LOADING IMAGES
+//-------------------------------------------------
+
+//We use the "lazy-img" CSS class to apply a blur filter on the low quality image
+//We do this so that we cannot actually see the bad image quality and we get more of a "preview" look
+
+//We are not lazy loading all images, only the ones that have the property [data-src]
+const loadImg = function(entries, observer) {
+  const [entry] = entries;
+  if(!entry.isIntersecting) return;
+
+  //Replace src with data-src
+  entry.target.src = entry.target.dataset.src;
+
+  //Check for loaded event
+  //This is important because if we remove the lazy loading before the image is loaded then we defeat the purpose of this function
+  //Note: You can simulate low quality networks using the network section of the inspection tools
+  entry.target.addEventListener('load', function(){
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg,{
+  root: null,
+  threshold: 0,
+});
+
+imgTargets.forEach(img => imgObserver.observe(img));
+
+//-------------------------------------------------
+// IMAGE SLIDER
+//-------------------------------------------------
+
+const slider = function(){
+  let currentSlide = 0;
+  const maxSlide = slides.length;
+
+  //TranslateX will move images from 0%, 100%, 200% to -100%, -200%, -300%
+  //Image 1 is at position 100%
+  //Image 2 is at position 200%
+  //Image 3 is at position 300%
+  const goToSlide = function(slide){
+    slides.forEach((s, currentIndex) => {
+      s.style.transform = `translateX(${100 * (currentIndex - slide)}%)`;
+    });
+  };
+
+  const nextSlide = function(){
+    currentSlide = (currentSlide + 1) % maxSlide;
+    goToSlide(currentSlide);
+  };
+
+  const prevSlide = function(){
+    currentSlide = (currentSlide - 1 + maxSlide) % maxSlide;
+    goToSlide(currentSlide);
+  };
+
+  document.querySelector('.slider__btn--right').addEventListener('click', nextSlide);
+  document.querySelector('.slider__btn--left').addEventListener('click', prevSlide);
+
+  //Initial slide
+  goToSlide(0);
+};
+
+slider();
+
+//-------------------------------------------------
+// LEAVE WEBSITE CONFIRMATION
+//-------------------------------------------------
+
+window.addEventListener('beforeunload', function(event) {
+  event.preventDefault();
+  event.returnValue = ''; // Required for Chrome
 });
