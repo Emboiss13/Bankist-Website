@@ -264,3 +264,12 @@ const slider = function(){
 };
 
 slider();
+
+//-------------------------------------------------
+// LEAVE WEBSITE CONFIRMATION
+//-------------------------------------------------
+
+window.addEventListener('beforeunload', function(event) {
+  event.preventDefault();
+  event.returnValue = ''; // Required for Chrome
+});
