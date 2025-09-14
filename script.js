@@ -15,6 +15,7 @@ const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
 const imgTargets = document.querySelectorAll('img[data-src]');
+const slides = document.querySelectorAll('.slide');
 
 //-------------------------------------------------
 // MODAL WINDOW
@@ -226,3 +227,40 @@ const imgObserver = new IntersectionObserver(loadImg,{
 });
 
 imgTargets.forEach(img => imgObserver.observe(img));
+
+//-------------------------------------------------
+// IMAGE SLIDER
+//-------------------------------------------------
+
+const slider = function(){
+  let currentSlide = 0;
+  const maxSlide = slides.length;
+
+  //TranslateX will move images from 0%, 100%, 200% to -100%, -200%, -300%
+  //Image 1 is at position 100%
+  //Image 2 is at position 200%
+  //Image 3 is at position 300%
+  const goToSlide = function(slide){
+    slides.forEach((s, currentIndex) => {
+      s.style.transform = `translateX(${100 * (currentIndex - slide)}%)`;
+    });
+  };
+
+  const nextSlide = function(){
+    currentSlide = (currentSlide + 1) % maxSlide;
+    goToSlide(currentSlide);
+  };
+
+  const prevSlide = function(){
+    currentSlide = (currentSlide - 1 + maxSlide) % maxSlide;
+    goToSlide(currentSlide);
+  };
+
+  document.querySelector('.slider__btn--right').addEventListener('click', nextSlide);
+  document.querySelector('.slider__btn--left').addEventListener('click', prevSlide);
+
+  //Initial slide
+  goToSlide(0);
+};
+
+slider();
