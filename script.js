@@ -14,6 +14,7 @@ const header = document.querySelector('.header');
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
+const imgTargets = document.querySelectorAll('img[data-src]');
 
 //-------------------------------------------------
 // MODAL WINDOW
@@ -194,3 +195,34 @@ allSections.forEach(section => {
   section.classList.add('section--hidden');
   sectionObserver.observe(section);
 });
+
+//-------------------------------------------------
+// LAZY LOADING IMAGES
+//-------------------------------------------------
+
+//We use the "lazy-img" CSS class to apply a blur filter on the low quality image
+//We do this so that we cannot actually see the bad image quality and we get more of a "preview" look
+
+//We are not lazy loading all images, only the ones that have the property [data-src]
+const loadImg = function(entries, observer) {
+  const [entry] = entries;
+  if(!entry.isIntersecting) return;
+
+  //Replace src with data-src
+  entry.target.src = entry.target.dataset.src;
+
+  //Check for loaded event
+  //This is important because if we remove the lazy loading before the image is loaded then we defeat the purpose of this function
+  //Note: You can simulate low quality networks using the network section of the inspection tools
+  entry.target.addEventListener('load', function(){
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg,{
+  root: null,
+  threshold: 0,
+});
+
+imgTargets.forEach(img => imgObserver.observe(img));
