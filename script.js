@@ -39,6 +39,16 @@ document.addEventListener('keydown', function (e) {
 // PAGE NAVIGATION
 //-------------------------------------------------
 
+//Using event delegation
+document.querySelector('.nav').addEventListener('click', function(event){
+  event.preventDefault();
+
+  // Check if the clicked element is a nav link
+  if(event.target.classList.contains('nav__link')){
+    const id = event.target.getAttribute('href');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
+});
 
 //-------------------------------------------------
 // BUTTON SCROLLING
