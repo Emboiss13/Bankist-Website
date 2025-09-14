@@ -8,7 +8,9 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const allSections = document.querySelectorAll('.section');
 const nav = document.querySelector('.nav');
+const header = document.querySelector('.header');
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
@@ -123,4 +125,72 @@ nav.addEventListener('mouseover', function(event){
 
 nav.addEventListener('mouseout', function(event){
   handleHover(event, 1);
+});
+
+//-------------------------------------------------
+// STICKY NAVIGATION BAR
+//-------------------------------------------------
+
+const initialCoordinates = section1.getBoundingClientRect();
+
+//WE SHOULD AVOID THE SCROLL EVENT SINCE IT TRIGGERS MULTIPLE TIMES
+//This is very bad for performance, specially on mobile devices
+
+// //We make it "sticky" by adding the "nav sticky" CSS class
+// window.addEventListener('scroll', function(){
+//   if(window.scrollY > initialCoordinates.top) nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// });
+
+//We will now do this using the intersection observer API
+//Why? Because it is more efficient.
+//It allows us to observe changes in the intersection of a target element with an ancestor element or with a top-level document's viewport.
+
+/*This funtion will be called each time:
+                 observer element -> intersects:
+                                       -> root element at defined threshold
+*/
+
+const stickyNav = function(entries){
+  const [entry] = entries;
+  if(!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+};
+
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  threshold: [0, 0.2],
+  rootMargin: '-90px',
+});
+
+headerObserver.observe(header);
+
+//-------------------------------------------------
+// REVEAL ELEMENTS AS WE SCROLL CLOSE TO THEM
+//-------------------------------------------------
+
+//We will achieve this by removing the section--hidden class
+const revealSection = function(entries, observer){
+
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    entry.target.classList.remove('section--hidden');
+
+      //Stop observing the element
+    //This will improve performance
+    observer.unobserve(entry.target);
+  });
+};
+
+//We don't want to reveal the section straight away
+//Otherwise the effect is not visible
+//By having a 0.15 threshold, we can control when the section is revealed
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+allSections.forEach(section => {
+  section.classList.add('section--hidden');
+  sectionObserver.observe(section);
 });
